@@ -21,7 +21,7 @@ The Circuit
 #include "Clock.h"
 
 // is this needed here? this should be in the clock driver
-#define DS1307_ADDRESS 0x68		// RTC
+//#define DS1307_ADDRESS 0x68		// RTC
 
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 #define DHTPIN 4     // what digital pin we're connected to for the temp/humid sensor
