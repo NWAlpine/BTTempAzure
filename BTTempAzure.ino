@@ -1,5 +1,27 @@
 /*
 The Circuit
+
+Clock (I2C)
+SDA		A4
+CLK		A5
+
+SD card
+CS		D10		Chip Select
+DI		D11		Data In
+DO		D12		Data out
+CLK		D13		Clock
+CD		D5		Card Detect	(via 10K resistor)
+
+Bluetooth module
+RX		D3
+TX		D2
+
+DHT22
+Data (pin2)		D4	via 10K resistor
+
+LED
+D6
+D7
 */
 
 // BT Temp Azure project
