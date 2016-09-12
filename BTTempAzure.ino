@@ -1,15 +1,24 @@
 /*
-The Circuit
+- BT Temp Azure project
+read data from the sensor
+send it to RPi2 via BT
+send to BT device i.e. mobile device
+save to SD if network is not avail
+
+- The Circuit
 
 Clock (I2C)
 SDA		A4
 CLK		A5
 
 SD card
-CS		D10		Chip Select
-DI		D11		Data In
-DO		D12		Data out
-CLK		D13		Clock
+SD card connect to arduino UNO via SPI (MOSI, MISO, SCK and CS)
+CD - Card Detect pin. It shorts to ground when a card is inserted.
+Connect a pull up resistor (10K or so) and wire this to another pin if you want to detect when a card is inserted.
+CS		D10		Chip Select (or breakout board select)
+DI		D11		Data In (MOSI)
+DO		D12		Data out (MISO)
+CLK		D13		SPI Clock
 CD		D5		Card Detect	(via 10K resistor)
 
 Bluetooth module
@@ -17,20 +26,15 @@ RX		D3
 TX		D2
 
 DHT22
-Data (pin2)		D4	via 10K resistor
+Data(pin2)	D4	via 10K resistor from data pin to power of the sensor
 
 LED
 D6
 D7
 */
 
-// BT Temp Azure project
-// read data from the sensor
-// send it to RPi2 via BT
-// send to BT device
-// save to SD if network is not avail
 
-// using #define to reduce storage
+// using preprocessor #define to reduce storage costs
 
 #include "Wire.h"		// I2C = clock
 #include "DHT.h"
@@ -41,9 +45,6 @@ D7
 
 // my clock specific functions
 #include "Clock.h"
-
-// is this needed here? this should be in the clock driver
-//#define DS1307_ADDRESS 0x68		// RTC
 
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 #define DHTPIN 4     // what digital pin we're connected to for the temp/humid sensor
@@ -69,44 +70,13 @@ unsigned long lastMillis = 0;		// millisecond counter since power on
 const int pollingSeconds = 5000;	// polling interval
 int lastMills = 0;
 
-/*
-Uncomment whatever type you're using!
-#define DHTTYPE DHT11   // DHT 11
-#define DHTTYPE DHT21   // DHT 21 (AM2301)
-
-Connect pin 1 (on the left) of the sensor to +5V
-NOTE: If using a board with 3.3V logic like an Arduino Due connect pin 1
-to 3.3V instead of 5V!
-Connect pin 2 of the sensor to whatever your DHTPIN is
-Connect pin 4 (on the right) of the sensor to GROUND
-Connect a 10K resistor from pin 2 (data) to pin 1 (power) of the sensor
-
-Initialize DHT sensor.
-Note that older versions of this library took an optional third parameter to
-tweak the timings for faster processors.  This parameter is no longer needed
-as the current DHT reading algorithm adjusts itself to work on faster procs.
-*/
-
-/*
-SD card connect to arduino UNO via SPI (MOSI, MISO, SCK and CS)
-CD - Card Detect pin. It shorts to ground when a card is inserted.
-Connect a pull up resistor (10K or so) and wire this to another pin if you want to detect when a card is inserted.
-
-Connect the 5V pin to the 5V pin on the Arduino
-Connect the GND pin to the GND pin on the Arduino
-Connect CLK to pin 13	(SPI Clock)
-Connect DO to pin 12	(MISO)
-Connect DI to pin 11	(MOSI)
-Connect CS to pin 10	(Chip Select)
-*/
-
 // init the temp sensor
 DHT dht(DHTPIN, DHTTYPE);
 
 // init the serial (bluetooth) modem
 SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);
 
-// init the clock
+// init the clock class
 Clock *clock = new Clock();
 
 // data structure for temp reading
@@ -231,7 +201,7 @@ void loop()
 				myFile.print(",");
 				myFile.print(tmpData->heatIndexF);
 				myFile.print(",");
-				myFile.print(tmpData->heatIndexC);
+				myFile.println(tmpData->heatIndexC);
 
 				myFile.close();
 			}
