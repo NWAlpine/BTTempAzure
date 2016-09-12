@@ -119,7 +119,7 @@ struct TempReadings
 	float heatIndexC;
 };
 
-// clock returns an int for the weekday: 0 - 6
+// clock returns an int for the weekday: 1 - 7 will need to offset
 char *weekdayTable[] = { "Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat" };
 
 TempReadings *tmpData = new TempReadings();
