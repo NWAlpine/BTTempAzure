@@ -94,6 +94,10 @@ char *weekdayTable[] = { "Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat" };
 
 TempReadings *tmpData = new TempReadings();
 
+// when connected via BT 
+bool isConnected = false;
+bool lastConnectedState = false;
+
 void setup()
 {
 	Wire.begin();
@@ -141,6 +145,7 @@ void setup()
 
 void loop()
 {
+	/*
 	if (bluetooth.available())
 	{
 		//Serial.print((char)bluetooth.read());
@@ -150,14 +155,29 @@ void loop()
 		{
 			digitalWrite(LED, HIGH);
 			bluetooth.println("On.");
+			isConnected = true;
 		}
 		if (c == 'l')
 		{
 			digitalWrite(LED, LOW);
 			bluetooth.println("Off.");
+			isConnected = false;
 		}
 	}
+	*/
 
+	// check to see if any input
+	readBluetoothData();
+	if (isConnected)
+	{
+		pullData();
+	}
+
+} // end loop
+
+void pullData()
+{
+	// ok, lets pull data and send it
 	if (millis() - lastMillis > pollingSeconds)
 	{
 		// take environment readings and fetch time
@@ -215,6 +235,31 @@ void loop()
 		{
 			// retry this: myFile = SD.open(logFileName, FILE_WRITE);
 			bluetooth.println("No SD Card Detected.");
+		}
+	}
+}
+
+
+void readBluetoothData()
+{
+	if (bluetooth.available())
+	{
+		//Serial.print((char)bluetooth.read());
+		byte c = (char)bluetooth.read();
+
+		if (c == 'h')
+		{
+			digitalWrite(LED, HIGH);
+			bluetooth.println("On.");
+			//return true;
+			isConnected = true;
+		}
+		if (c == 'l')
+		{
+			digitalWrite(LED, LOW);
+			bluetooth.println("Off.");
+			//return false;
+			isConnected = false;
 		}
 	}
 }
@@ -320,18 +365,6 @@ void printDate()
 	bluetooth.print(clock->second);
 	bluetooth.print(" ");
 	bluetooth.println(weekdayTable[clock->weekDay]);
-}
-
-void sendData()
-{
-	/*
-	char buf[2];
-	buf[0] = (clock->month + '0');
-	buf[1] = 'h';
-	Serial.println(buf);
-	// sending CSV format TODO: header file needs schema
-	*/
-
 }
 
 bool cardExist()
