@@ -33,7 +33,6 @@ D6
 D7
 */
 
-
 // using preprocessor #define to reduce storage costs
 
 #include "Wire.h"		// I2C = clock
@@ -94,9 +93,8 @@ char *weekdayTable[] = { "Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat" };
 
 TempReadings *tmpData = new TempReadings();
 
-// when connected via BT 
-bool isConnected = false;
-bool lastConnectedState = false;
+// when connected via BT, assume enabled once connected
+bool isConnected = true;
 
 void setup()
 {
@@ -106,7 +104,7 @@ void setup()
 	pinMode(DATA_LED, OUTPUT);
 	pinMode(CARD_DETECT_PIN, INPUT_PULLUP);
 
-	digitalWrite(LED, LOW);
+	digitalWrite(LED, HIGH);		// TODO: this is the connected LED, by default assume connected
 	digitalWrite(DATA_LED, LOW);
 
 	// sparkfun defaults to 115200 change it to 9600 no parity
@@ -123,7 +121,7 @@ void setup()
 	// all this waiting, not good... undeterministic...
 	delay(500);
 	bluetooth.begin(9600);
-	delay(8000);
+	delay(5000);
 
 	// check if the SD reader is avail TODO: move this to a function
 	if (SD.begin(CHIP_SELECT))
@@ -145,35 +143,13 @@ void setup()
 
 void loop()
 {
-	/*
-	if (bluetooth.available())
-	{
-		//Serial.print((char)bluetooth.read());
-		byte c = (char)bluetooth.read();
-
-		if (c == 'h')
-		{
-			digitalWrite(LED, HIGH);
-			bluetooth.println("On.");
-			isConnected = true;
-		}
-		if (c == 'l')
-		{
-			digitalWrite(LED, LOW);
-			bluetooth.println("Off.");
-			isConnected = false;
-		}
-	}
-	*/
-
 	// check to see if any input
 	readBluetoothData();
 	if (isConnected)
 	{
 		pullData();
 	}
-
-} // end loop
+}
 
 void pullData()
 {
@@ -239,7 +215,6 @@ void pullData()
 	}
 }
 
-
 void readBluetoothData()
 {
 	if (bluetooth.available())
@@ -251,14 +226,12 @@ void readBluetoothData()
 		{
 			digitalWrite(LED, HIGH);
 			bluetooth.println("On.");
-			//return true;
 			isConnected = true;
 		}
 		if (c == 'l')
 		{
 			digitalWrite(LED, LOW);
 			bluetooth.println("Off.");
-			//return false;
 			isConnected = false;
 		}
 	}
