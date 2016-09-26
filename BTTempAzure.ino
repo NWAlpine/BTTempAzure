@@ -94,6 +94,7 @@ char *weekdayTable[] = { "Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat" };
 TempReadings *tmpData = new TempReadings();
 
 // when connected via BT, assume enabled once connected
+// TODO: differentiate betwen connected to a device and sending to the device
 bool isConnected = true;
 
 void setup()
@@ -138,6 +139,13 @@ void setup()
 				createFile();
 			}
 		}
+	}
+
+	if (isConnected)
+	{
+		// TODO: move this to the "am I connected to a remote device"
+		// routine vs send to a device that's connected
+		digitalWrite(LED, HIGH);
 	}
 }
 
